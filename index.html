@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>한국레이더시스템 - 회사소개 및 사업분야</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Three.js for 3D Animation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            scroll-behavior: smooth;
+            background-color: #ffffff; 
+        }
+
+        /* 3D Canvas Styling */
+        #hero-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* Scroll-reveal animations */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 1s ease-out, transform 0.8s ease-out;
+        }
+        .scroll-reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Custom card colors */
+        .card-yellow { border-color: #facc15; }
+        .card-yellow:hover { box-shadow: 0 10px 25px -5px rgba(250, 204, 21, 0.2), 0 8px 10px -6px rgba(250, 204, 21, 0.2); }
+        .card-pink { border-color: #ec4899; }
+        .card-pink:hover { box-shadow: 0 10px 25px -5px rgba(236, 72, 153, 0.2), 0 8px 10px -6px rgba(236, 72, 153, 0.2); }
+        .card-blue { border-color: #3b82f6; }
+        .card-blue:hover { box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.2), 0 8px 10px -6px rgba(59, 130, 246, 0.2); }
+    </style>
+</head>
+<body class="bg-white text-gray-800">
+
+    <!-- Hero Section with 3D Particle Animation -->
+    <header class="relative flex items-center justify-center h-screen mb-12 overflow-hidden bg-white">
+        <canvas id="hero-canvas"></canvas>
+        <div class="relative z-10 text-center p-5">
+            <h1 class="text-4xl md:text-6xl lg:text-7xl font-black tracking-tighter leading-tight mb-4 text-gray-900">
+                <span class="block">최적의 <span class="text-purple-600">융복합 솔루션</span> 전문 기업</span>
+                <span class="block bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600 mt-2">한국레이더시스템</span>
+            </h1>
+            <p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
+                영상 정보처리 기술과 레이더 신호처리 기술의 결합으로 보안 및 방재 환경을 선도합니다.
+            </p>
+        </div>
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 z-10">
+            <a href="#introduction" class="animate-bounce block">
+                <i class="ph-arrow-down text-3xl text-gray-400 hover:text-purple-600 transition-colors"></i>
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="container mx-auto px-6 lg:px-8 py-16">
+
+        <!-- Introduction Section -->
+        <section id="introduction" class="mb-24 scroll-reveal">
+            <div class="text-center max-w-4xl mx-auto">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-6">(주)한국레이더시스템</h2>
+                <p class="text-lg text-gray-700 leading-relaxed">
+                    다년간 축적된 영상 정보처리 노하우를 바탕으로 스마트 교통, 스마트 횡단보도, 차량번호인식 등 영상 보안 관련 솔루션 및 레이더 신호 데이터 처리 기술을 바탕으로 스마트 방재 시스템, 스마트 소하천 관리 시스템 등 가시 영역(Visible) + 비가시영역(Invisible)의 경계를 결합한 최적의 <strong class="text-purple-600 font-semibold">융복합 솔루션</strong>으로 보안 및 방재 환경 분야 시스템 설계 및 구축 전문 기업입니다.
+                </p>
+            </div>
+        </section>
+        
+        <!-- Core Solution Section -->
+        <section id="solution" class="py-16 mb-16 scroll-reveal">
+            <div class="grid grid-cols-1 md:grid-cols-5 items-center gap-8 text-center">
+                <div class="md:col-span-2 space-y-8">
+                    <div class="bg-slate-100 p-6 rounded-lg border border-slate-200">
+                        <h3 class="text-2xl font-bold text-gray-800"><i class="ph-camera text-purple-500 mr-2"></i>가시 영역</h3>
+                        <p class="text-gray-600 mt-2">지능형 영상분석</p>
+                    </div>
+                     <div class="bg-slate-100 p-6 rounded-lg border border-slate-200">
+                        <h3 class="text-2xl font-bold text-gray-800"><i class="ph-wifi-high text-purple-500 mr-2"></i>비가시 영역</h3>
+                        <p class="text-gray-600 mt-2">스마트 레이더</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center justify-center md:block">
+                    <div class="w-full h-0.5 md:w-0.5 md:h-24 bg-slate-300 my-4 md:my-0 md:mx-auto"></div>
+                    <i class="ph-arrows-clockwise text-5xl text-purple-500 mx-4 md:my-4"></i>
+                    <div class="w-full h-0.5 md:w-0.5 md:h-24 bg-slate-300 my-4 md:my-0 md:mx-auto"></div>
+                </div>
+
+                <div class="md:col-span-2 bg-gradient-to-br from-purple-600 to-indigo-600 p-8 rounded-lg shadow-xl">
+                    <h3 class="text-4xl font-black text-white">융복합 솔루션</h3>
+                    <p class="text-purple-200 mt-2 text-lg">가시영역 + 비가시영역</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Business Areas Section -->
+        <section id="business" class="py-16 scroll-reveal">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900">주요 사업분야</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- 스마트 교통 -->
+                <div class="bg-white rounded-xl p-6 shadow-md border-2 card-yellow transform hover:-translate-y-2 transition-all duration-300">
+                    <div class="flex items-center mb-4"><i class="ph-traffic-signal text-5xl text-yellow-500 mr-4"></i><div><h3 class="text-2xl font-bold text-gray-900">스마트 교통</h3><p class="text-yellow-700/80">Smart Traffic</p></div></div>
+                    <p class="text-gray-600">교통량 분석을 통하여 최적 교통신호 산출</p>
+                </div>
+                <!-- 스마트 횡단보도 -->
+                <div class="bg-white rounded-xl p-6 shadow-md border-2 card-pink transform hover:-translate-y-2 transition-all duration-300">
+                    <div class="flex items-center mb-4"><i class="ph-person text-5xl text-pink-500 mr-4"></i><div><h3 class="text-2xl font-bold text-gray-900">스마트 횡단보도</h3><p class="text-pink-700/80">Smart Crosswalk</p></div></div>
+                    <p class="text-gray-600">차량 및 보행자 감지를 통하여 안전한 보행 환경 조성</p>
+                </div>
+                <!-- 스마트 방재 시스템 -->
+                <div class="bg-white rounded-xl p-6 shadow-md border-2 card-blue transform hover:-translate-y-2 transition-all duration-300">
+                    <div class="flex items-center mb-4"><i class="ph-shield-warning text-5xl text-blue-500 mr-4"></i><div><h3 class="text-2xl font-bold text-gray-900">스마트 방재</h3><p class="text-blue-700/80">Smart Disaster Prev.</p></div></div>
+                    <p class="text-gray-600">유무선 센싱 정보를 기반으로 상시 시스템 구축</p>
+                </div>
+                <!-- 스마트 교차로 -->
+                <div class="bg-white rounded-xl p-6 shadow-md border-2 card-yellow transform hover:-translate-y-2 transition-all duration-300">
+                    <div class="flex items-center mb-4"><i class="ph-intersect text-5xl text-yellow-500 mr-4"></i><div><h3 class="text-2xl font-bold text-gray-900">스마트 교차로</h3><p class="text-yellow-700/80">Smart Crossroads</p></div></div>
+                    <p class="text-gray-600">교통량 분석 및 최적 신호주기 제어를 하여 최적 교통 시스템 구축</p>
+                </div>
+                <!-- 차량번호 인식 -->
+                <div class="bg-white rounded-xl p-6 shadow-md border-2 card-pink transform hover:-translate-y-2 transition-all duration-300">
+                    <div class="flex items-center mb-4"><i class="ph-number-plate text-5xl text-pink-500 mr-4"></i><div><h3 class="text-2xl font-bold text-gray-900">차량번호 인식</h3><p class="text-pink-700/80">License Plate Recog.</p></div></div>
+                    <p class="text-gray-600">AI 기반 다중 차량 탐지 및 차량 번호 인식</p>
+                </div>
+                <!-- 스마트 소하천 관리 -->
+                <div class="bg-white rounded-xl p-6 shadow-md border-2 card-blue transform hover:-translate-y-2 transition-all duration-300">
+                    <div class="flex items-center mb-4"><i class="ph-waves text-5xl text-blue-500 mr-4"></i><div><h3 class="text-2xl font-bold text-gray-900">스마트 소하천 관리</h3><p class="text-blue-700/80">Smart River Mgmt.</p></div></div>
+                    <p class="text-gray-600">소하천 유량 관리를 통한 스마트 하천 관리</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-50 border-t border-slate-200 mt-16">
+        <div class="container mx-auto py-8 px-6 text-center text-slate-500">
+            <p>&copy; 2024 Korea Radar System. All Rights Reserved.</p>
+            <p class="text-sm mt-2">본 페이지는 원본 콘텐츠를 바탕으로 시각적으로 재구성되었습니다.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript for animations -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- 3D Hero Animation ---
+            let scene, camera, renderer, particles, mouseX = 0, mouseY = 0;
+            const canvas = document.getElementById('hero-canvas');
+            
+            function init3D() {
+                scene = new THREE.Scene();
+                camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                camera.position.z = 5;
+                
+                renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true });
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+                // Particles
+                const particleCount = 5000;
+                const positions = new Float32Array(particleCount * 3);
+                for (let i = 0; i < particleCount; i++) {
+                    positions[i * 3 + 0] = (Math.random() - 0.5) * 10; // x
+                    positions[i * 3 + 1] = (Math.random() - 0.5) * 10; // y
+                    positions[i * 3 + 2] = (Math.random() - 0.5) * 10; // z
+                }
+                const particlesGeometry = new THREE.BufferGeometry();
+                particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                
+                const particlesMaterial = new THREE.PointsMaterial({
+                    color: 0x8b5cf6, // purple-500
+                    size: 0.02,
+                    sizeAttenuation: true
+                });
+
+                particles = new THREE.Points(particlesGeometry, particlesMaterial);
+                scene.add(particles);
+                
+                document.addEventListener('mousemove', onDocumentMouseMove, false);
+                window.addEventListener('resize', onWindowResize, false);
+            }
+
+            function onWindowResize() {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+            
+            function onDocumentMouseMove(event) {
+                mouseX = (event.clientX - window.innerWidth / 2) / 1000;
+                mouseY = (event.clientY - window.innerHeight / 2) / 1000;
+            }
+
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                const elapsedTime = Date.now() * 0.0001;
+                
+                // Animate particles
+                particles.rotation.y = elapsedTime * 0.5;
+                
+                // Animate camera
+                camera.position.x += (mouseX - camera.position.x) * 0.05;
+                camera.position.y += (-mouseY - camera.position.y) * 0.05;
+                camera.lookAt(scene.position);
+                
+                renderer.render(scene, camera);
+            }
+            
+            init3D();
+            animate();
+
+            // --- Scroll Animations ---
+            const revealElements = document.querySelectorAll('.scroll-reveal');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        // No need to unobserve, let it stay active
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            revealElements.forEach(el => {
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>
