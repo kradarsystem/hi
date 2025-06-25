@@ -136,8 +136,8 @@
 </head>
 <body class="bg-slate-50 text-gray-800">
 
-    <!-- 스크롤바 문제를 해결하기 위해 h-[90vh]를 py-32 (padding)로 변경 -->
-    <header class="relative flex items-center justify-center py-32 overflow-hidden bg-slate-50">
+    <!-- Header: 스크롤바 문제를 해결하기 위해 padding을 py-24로 조정 -->
+    <header class="relative flex items-center justify-center py-24 overflow-hidden bg-slate-50">
         <canvas id="hero-canvas"></canvas>
         <div class="relative z-10 text-center p-5">
             <h1 class="text-4xl md:text-6xl lg:text-7xl font-black tracking-tighter leading-tight mb-4 text-gray-900">
@@ -155,9 +155,11 @@
         </div>
     </header>
 
-    <main class="container mx-auto px-6 lg:px-8 py-16">
+    <!-- Main: space-y 유틸리티로 section 간 간격을 일관되게 관리 -->
+    <main class="container mx-auto px-6 lg:px-8 py-24 space-y-24">
 
-        <section id="introduction" class="mb-24">
+        <!-- Section Introduction: mb-24 제거 -->
+        <section id="introduction">
             <div class="text-center max-w-4xl mx-auto">
                 <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-16 scroll-reveal">(주)한국레이더시스템</h2>
                 <div class="space-y-8">
@@ -196,8 +198,8 @@
             </div>
         </section>
         
-        <!-- 핵심 솔루션 섹션 -->
-        <section id="solution" class="relative py-16 mb-16 overflow-hidden">
+        <!-- Section Solution: py-16, mb-16 제거 -->
+        <section id="solution" class="relative overflow-hidden">
             <svg id="solution-svg" class="absolute top-0 left-0 w-full h-full z-0 pointer-events-none" aria-hidden="true">
                 <defs>
                     <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -243,7 +245,8 @@
             </div>
         </section>
 
-        <section id="business" class="py-16">
+        <!-- Section Business: py-16 제거 -->
+        <section id="business">
             <div class="text-center mb-16 scroll-reveal">
                 <h2 class="text-3xl md:text-4xl font-bold text-gray-900">✨ 주요 사업분야</h2>
             </div>
