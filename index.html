@@ -20,13 +20,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     
     <style>
+        /* 기본 바디 스타일 */
         body {
             font-family: 'Noto Sans KR', sans-serif;
             scroll-behavior: smooth;
-            background-color: #f8fafc; /* Lighter slate color for a softer white */
+            background-color: #f8fafc; /* 부드러운 흰색 배경 */
+            overflow-x: hidden; /* 가로 스크롤 방지 */
         }
 
-        /* 3D Canvas Styling */
+        /* 3D 캔버스 스타일 */
         #hero-canvas {
             position: absolute;
             top: 0;
@@ -36,33 +38,36 @@
             z-index: 1;
         }
 
-        /* Scroll-reveal animations */
+        /* 스크롤에 따른 나타나는 애니메이션 */
         .scroll-reveal {
             opacity: 0;
             transform: translateY(50px);
             transition: opacity 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transition-delay: var(--delay, 0s);
         }
         .scroll-reveal.active {
             opacity: 1;
             transform: translateY(0);
         }
         
-        /* Business Area Card with animated gradient border */
+        /* 애니메이션 그라데이션 테두리가 있는 비즈니스 카드 */
         .business-card {
             position: relative;
             background-color: white;
             z-index: 1;
             overflow: hidden;
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .business-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 25px 50px -12px rgba(128, 90, 213, 0.25);
         }
         .business-card::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             border: 2px solid transparent;
-            border-radius: 0.75rem; /* rounded-xl */
+            border-radius: 0.75rem;
             background: linear-gradient(var(--angle), var(--color-1), var(--color-2)) border-box;
             -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
             mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
@@ -80,21 +85,57 @@
             inherits: false;
         }
         @keyframes rotate-gradient {
-            0%   { --angle: 0deg; }
-            100% { --angle: 360deg; }
+            from { --angle: 0deg; }
+            to { --angle: 360deg; }
         }
 
-        /* Specific card colors */
+        /* 카드 색상 정의 */
         .card-yellow { --color-1: #fbbf24; --color-2: #f59e0b; }
         .card-pink { --color-1: #f472b6; --color-2: #ec4899; }
         .card-blue { --color-1: #60a5fa; --color-2: #3b82f6; }
+        .card-green { --color-1: #4ade80; --color-2: #22c55e; }
+        .card-red { --color-1: #f87171; --color-2: #ef4444; }
+        .card-sky { --color-1: #7dd3fc; --color-2: #38bdf8; }
 
+        /* --- 핵심 솔루션 섹션 애니메이션 --- */
+        #solution.is-animating #target-icon i {
+            animation: spin 10s linear infinite;
+        }
+        #solution.is-animating #result-card {
+            animation: pulse-glow 1.5s ease-in-out 1s forwards;
+        }
+        #solution.is-animating #source-card-1,
+        #solution.is-animating #source-card-2 {
+            animation: pulse-source-card 1s ease-in-out forwards;
+        }
+
+        .solution-particle {
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        #solution.is-animating .solution-particle {
+            opacity: 1;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes pulse-glow {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(167, 139, 250, 0.7); }
+            50% { transform: scale(1.05); box-shadow: 0 0 20px 10px rgba(167, 139, 250, 0.4); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(167, 139, 250, 0); }
+        }
+        @keyframes pulse-source-card {
+            0% { box-shadow: 0 0 0 0 rgba(129, 140, 248, 0.5); }
+            50% { box-shadow: 0 0 15px 5px rgba(129, 140, 248, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(129, 140, 248, 0); }
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-gray-800">
 
-    <!-- Hero Section with 3D Plexus Animation -->
-    <header class="relative flex items-center justify-center h-screen mb-12 overflow-hidden bg-slate-50">
+    <header class="relative flex items-center justify-center h-[95vh] overflow-hidden bg-slate-50">
         <canvas id="hero-canvas"></canvas>
         <div class="relative z-10 text-center p-5">
             <h1 class="text-4xl md:text-6xl lg:text-7xl font-black tracking-tighter leading-tight mb-4 text-gray-900">
@@ -112,16 +153,13 @@
         </div>
     </header>
 
-    <!-- Main Content Area -->
     <main class="container mx-auto px-6 lg:px-8 py-16">
 
-        <!-- Introduction Section -->
-        <section id="introduction" class="mb-24 scroll-reveal">
+        <section id="introduction" class="mb-24">
             <div class="text-center max-w-4xl mx-auto">
-                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-16">(주)한국레이더시스템</h2>
-                
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-16 scroll-reveal">(주)한국레이더시스템</h2>
                 <div class="space-y-8">
-                    <div class="bg-white p-8 rounded-lg border border-slate-200 shadow-lg">
+                     <div class="bg-white p-8 rounded-lg border border-slate-200 shadow-lg scroll-reveal" style="--delay: 0.2s;">
                         <div class="md:flex items-center text-left">
                             <i class="ph-video-camera text-6xl text-purple-600 mr-6 mb-4 md:mb-0 flex-shrink-0"></i>
                             <p class="text-lg md:text-xl text-gray-700 leading-relaxed">
@@ -129,8 +167,8 @@
                             </p>
                         </div>
                     </div>
-                    <div class="flex justify-center my-6"><i class="ph-plus-circle text-5xl text-slate-400 transform transition-transform duration-500 hover:scale-125 hover:text-purple-500"></i></div>
-                    <div class="bg-white p-8 rounded-lg border border-slate-200 shadow-lg">
+                    <div class="flex justify-center my-6 scroll-reveal" style="--delay: 0.3s;"><i class="ph-plus-circle text-5xl text-slate-400 transform transition-transform duration-500 hover:scale-125 hover:rotate-90 hover:text-purple-500"></i></div>
+                    <div class="bg-white p-8 rounded-lg border border-slate-200 shadow-lg scroll-reveal" style="--delay: 0.4s;">
                         <div class="md:flex items-center text-left">
                            <i class="ph-broadcast text-6xl text-blue-600 mr-6 mb-4 md:mb-0 flex-shrink-0"></i>
                            <p class="text-lg md:text-xl text-gray-700 leading-relaxed">
@@ -138,13 +176,13 @@
                             </p>
                         </div>
                     </div>
-                    <div class="flex justify-center my-6"><i class="ph-arrow-fat-down text-5xl text-slate-400"></i></div>
-                    <div class="text-center p-8">
+                    <div class="flex justify-center my-6 scroll-reveal" style="--delay: 0.5s;"><i class="ph-arrow-fat-down text-5xl text-slate-400"></i></div>
+                    <div class="text-center p-8 scroll-reveal" style="--delay: 0.6s;">
                         <p class="text-lg md:text-xl text-gray-700 leading-relaxed">
                             <strong class="text-purple-600">가시 영역(Visible)</strong> + <strong class="text-blue-600">비가시영역(Invisible)</strong>의 경계를 결합한 최적의 <strong class="text-2xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600">융복합 솔루션</strong>으로
                         </p>
                     </div>
-                     <div class="bg-white p-8 rounded-lg border border-slate-200 shadow-lg">
+                     <div class="bg-white p-8 rounded-lg border border-slate-200 shadow-lg scroll-reveal" style="--delay: 0.7s;">
                         <div class="md:flex items-center justify-center text-center">
                            <i class="ph-buildings text-6xl text-slate-600 mr-6 mb-4 md:mb-0"></i>
                            <p class="text-lg md:text-xl text-gray-700 leading-relaxed">
@@ -156,52 +194,117 @@
             </div>
         </section>
         
-        <!-- Core Solution Section -->
-        <section id="solution" class="py-16 mb-16 scroll-reveal">
-             <div class="grid grid-cols-1 md:grid-cols-5 items-center gap-8 text-center">
+        <!-- 핵심 솔루션 섹션 -->
+        <section id="solution" class="relative py-16 mb-16 overflow-hidden">
+            <svg id="solution-svg" class="absolute top-0 left-0 w-full h-full z-0 pointer-events-none" aria-hidden="true">
+                <defs>
+                    <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#a855f7" />
+                        <stop offset="100%" style="stop-color:#6366f1" />
+                    </linearGradient>
+                    <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#3b82f6" />
+                        <stop offset="100%" style="stop-color:#6366f1" />
+                    </linearGradient>
+                </defs>
+                <path id="path1" d="" fill="none" stroke="url(#gradient1)" stroke-width="2" stroke-linecap="round" stroke-dasharray="5 10" class="opacity-50"/>
+                <path id="path2" d="" fill="none" stroke="url(#gradient2)" stroke-width="2" stroke-linecap="round" stroke-dasharray="5 10" class="opacity-50"/>
+                <circle id="particle1" r="5" fill="url(#gradient1)" class="solution-particle" filter="url(#glow)"/>
+                <circle id="particle2" r="5" fill="url(#gradient2)" class="solution-particle" filter="url(#glow)"/>
+                 <filter id="glow">
+                    <feGaussianBlur stdDeviation="2.5" result="coloredBlur"></feGaussianBlur>
+                    <feMerge>
+                        <feMergeNode in="coloredBlur"></feMergeNode>
+                        <feMergeNode in="SourceGraphic"></feMergeNode>
+                    </feMerge>
+                </filter>
+            </svg>
+
+             <div class="relative z-10 grid grid-cols-1 md:grid-cols-5 items-center gap-8 text-center">
                 <div class="md:col-span-2 space-y-8">
-                    <div class="bg-white p-6 rounded-lg border border-slate-200 shadow-md">
+                    <div id="source-card-1" class="bg-white p-6 rounded-lg border border-slate-200 shadow-md">
                         <h3 class="text-2xl font-bold text-gray-800"><i class="ph-camera text-purple-500 mr-2"></i>가시 영역</h3>
                         <p class="text-gray-600 mt-2">지능형 영상분석</p>
                     </div>
-                     <div class="bg-white p-6 rounded-lg border border-slate-200 shadow-md">
+                     <div id="source-card-2" class="bg-white p-6 rounded-lg border border-slate-200 shadow-md">
                         <h3 class="text-2xl font-bold text-gray-800"><i class="ph-wifi-high text-blue-500 mr-2"></i>비가시 영역</h3>
                         <p class="text-gray-600 mt-2">스마트 레이더</p>
                     </div>
                 </div>
-                <div class="flex items-center justify-center md:block">
-                    <i class="ph-arrows-clockwise text-6xl text-purple-500 animate-spin" style="animation-duration: 10s;"></i>
+                <div id="target-icon" class="flex items-center justify-center md:block">
+                    <i class="ph-arrows-clockwise text-6xl text-purple-500"></i>
                 </div>
-                <div class="md:col-span-2 bg-gradient-to-br from-purple-600 to-indigo-600 p-8 rounded-lg shadow-xl transform transition-transform duration-500 hover:scale-105">
+                <div id="result-card" class="md:col-span-2 bg-gradient-to-br from-purple-600 to-indigo-600 p-8 rounded-lg shadow-xl">
                     <h3 class="text-4xl font-black text-white">융복합 솔루션</h3>
                     <p class="text-purple-200 mt-2 text-lg">가시영역 + 비가시영역</p>
                 </div>
             </div>
         </section>
 
-        <!-- Main Business Areas Section -->
-        <section id="business" class="py-16 scroll-reveal">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-4xl font-bold text-gray-900">주요 사업분야</h2>
+        <section id="business" class="py-16">
+            <div class="text-center mb-16 scroll-reveal">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900">✨ 주요 사업분야</h2>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="business-card rounded-xl p-6 shadow-md card-yellow transform hover:-translate-y-2 transition-all duration-300">
-                    <div class="flex items-center mb-4"><i class="ph-traffic-signal text-5xl text-yellow-500 mr-4"></i><div><h3 class="text-2xl font-bold text-gray-900">스마트 교통</h3><p class="text-yellow-700/80">Smart Traffic</p></div></div><p class="text-gray-600">교통량 분석을 통하여 최적 교통신호 산출</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                <div class="business-card rounded-xl p-8 shadow-md card-yellow scroll-reveal" style="--delay: 0.1s;">
+                    <div class="flex items-center mb-4">
+                        <i class="ph-traffic-signal text-5xl text-yellow-500 mr-4"></i>
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-900">🚦 스마트 교통</h3>
+                            <p class="text-yellow-700/80">Smart Traffic</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600">교통량 분석을 통하여 최적 교통신호 산출</p>
                 </div>
-                <div class="business-card rounded-xl p-6 shadow-md card-pink transform hover:-translate-y-2 transition-all duration-300">
-                    <div class="flex items-center mb-4"><i class="ph-person-simple-walk text-5xl text-pink-500 mr-4"></i><div><h3 class="text-2xl font-bold text-gray-900">스마트 횡단보도</h3><p class="text-pink-700/80">Smart Crosswalk</p></div></div><p class="text-gray-600">차량 및 보행자 감지를 통하여 안전한 보행 환경 조성</p>
+                <div class="business-card rounded-xl p-8 shadow-md card-pink scroll-reveal" style="--delay: 0.2s;">
+                    <div class="flex items-center mb-4">
+                        <i class="ph-person-simple-walk text-5xl text-pink-500 mr-4"></i>
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-900">🚶 스마트 횡단보도</h3>
+                            <p class="text-pink-700/80">Smart Crosswalk</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600">차량 및 보행자 감지를 통하여 안전한 보행 환경 조성</p>
                 </div>
-                <div class="business-card rounded-xl p-6 shadow-md card-blue transform hover:-translate-y-2 transition-all duration-300">
-                    <div class="flex items-center mb-4"><i class="ph-shield-warning text-5xl text-blue-500 mr-4"></i><div><h3 class="text-2xl font-bold text-gray-900">스마트 방재</h3><p class="text-blue-700/80">Smart Disaster Prev.</p></div></div><p class="text-gray-600">유무선 센싱 정보를 기반으로 상시 시스템 구축</p>
+                <div class="business-card rounded-xl p-8 shadow-md card-blue scroll-reveal" style="--delay: 0.3s;">
+                    <div class="flex items-center mb-4">
+                        <i class="ph-shield-warning text-5xl text-blue-500 mr-4"></i>
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-900">🛡️ 스마트 방재</h3>
+                            <p class="text-blue-700/80">Smart Disaster Prev.</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600">유무선 센싱 정보를 기반으로 상시 시스템 구축</p>
                 </div>
-                <div class="business-card rounded-xl p-6 shadow-md card-yellow transform hover:-translate-y-2 transition-all duration-300">
-                    <div class="flex items-center mb-4"><i class="ph-intersect text-5xl text-yellow-500 mr-4"></i><div><h3 class="text-2xl font-bold text-gray-900">스마트 교차로</h3><p class="text-yellow-700/80">Smart Crossroads</p></div></div><p class="text-gray-600">교통량 분석 및 최적 신호주기 제어를 하여 최적 교통 시스템 구축</p>
+                <div class="business-card rounded-xl p-8 shadow-md card-green scroll-reveal" style="--delay: 0.4s;">
+                    <div class="flex items-center mb-4">
+                        <i class="ph-intersect text-5xl text-green-500 mr-4"></i>
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-900">🔀 스마트 교차로</h3>
+                            <p class="text-green-700/80">Smart Crossroads</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600">교통량 분석 및 최적 신호주기 제어를 하여 최적 교통 시스템 구축</p>
                 </div>
-                <div class="business-card rounded-xl p-6 shadow-md card-pink transform hover:-translate-y-2 transition-all duration-300">
-                    <div class="flex items-center mb-4"><i class="ph-number-plate text-5xl text-pink-500 mr-4"></i><div><h3 class="text-2xl font-bold text-gray-900">차량번호 인식</h3><p class="text-pink-700/80">License Plate Recog.</p></div></div><p class="text-gray-600">AI 기반 다중 차량 탐지 및 차량 번호 인식</p>
+                <div class="business-card rounded-xl p-8 shadow-md card-red scroll-reveal" style="--delay: 0.5s;">
+                    <div class="flex items-center mb-4">
+                        <i class="ph-number-plate text-5xl text-red-500 mr-4"></i>
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-900">📸 차량번호 인식</h3>
+                            <p class="text-red-700/80">License Plate Recog.</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600">AI 기반 다중 차량 탐지 및 차량 번호 인식</p>
                 </div>
-                <div class="business-card rounded-xl p-6 shadow-md card-blue transform hover:-translate-y-2 transition-all duration-300">
-                    <div class="flex items-center mb-4"><i class="ph-waves text-5xl text-blue-500 mr-4"></i><div><h3 class="text-2xl font-bold text-gray-900">스마트 소하천 관리</h3><p class="text-blue-700/80">Smart River Mgmt.</p></div></div><p class="text-gray-600">소하천 유량 관리를 통한 스마트 하천 관리</p>
+                <div class="business-card rounded-xl p-8 shadow-md card-sky scroll-reveal" style="--delay: 0.6s;">
+                    <div class="flex items-center mb-4">
+                        <i class="ph-waves text-5xl text-sky-500 mr-4"></i>
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-900 whitespace-nowrap">🏞️ 스마트 소하천 관리</h3>
+                            <p class="text-sky-700/80">Smart River Mgmt.</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600">소하천 유량 관리를 통한 스마트 하천 관리</p>
                 </div>
             </div>
         </section>
@@ -209,96 +312,213 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- 3D Hero Animation (Plexus) ---
-            let scene, camera, renderer, points = [], lines = [], mouseX = 0, mouseY = 0;
+            // --- 3D Hero Animation ---
+            let scene, camera, renderer, points, pointMesh, linesMesh;
+            let mouseX = 0, mouseY = 0;
             const canvas = document.getElementById('hero-canvas');
-            const MAX_DISTANCE = 1.3;
-            
+            const header = canvas.parentElement;
+            const MAX_DISTANCE_SQ = 1.8 * 1.8;
+            const NUM_POINTS = 200;
+
             function init3D() {
                 scene = new THREE.Scene();
-                camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                camera = new THREE.PerspectiveCamera(75, header.offsetWidth / header.offsetHeight, 0.1, 1000);
                 camera.position.z = 5;
-                
                 renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
-                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setSize(header.offsetWidth, header.offsetHeight);
                 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-                // Points
                 const pointGeometry = new THREE.BufferGeometry();
-                const numPoints = 200;
-                const positions = new Float32Array(numPoints * 3);
-                
-                for(let i = 0; i < numPoints; i++) {
-                    const x = (Math.random() - 0.5) * 15;
-                    const y = (Math.random() - 0.5) * 15;
-                    const z = (Math.random() - 0.5) * 15;
+                const positions = new Float32Array(NUM_POINTS * 3);
+                const originalPositions = new Float32Array(NUM_POINTS * 3);
+                const animationData = new Float32Array(NUM_POINTS);
+                points = [];
+                for(let i = 0; i < NUM_POINTS; i++) {
+                    const x = (Math.random() - 0.5) * 15, y = (Math.random() - 0.5) * 15, z = (Math.random() - 0.5) * 15;
+                    positions[i * 3] = x; positions[i * 3 + 1] = y; positions[i * 3 + 2] = z;
+                    originalPositions[i * 3] = x; originalPositions[i * 3 + 1] = y; originalPositions[i * 3 + 2] = z;
+                    animationData[i] = Math.random() * Math.PI * 2;
                     points.push(new THREE.Vector3(x, y, z));
-                    positions[i * 3] = x;
-                    positions[i * 3 + 1] = y;
-                    positions[i * 3 + 2] = z;
                 }
                 pointGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-                const pointMaterial = new THREE.PointsMaterial({ color: 0x6d28d9, size: 0.05 });
-                const pointMesh = new THREE.Points(pointGeometry, pointMaterial);
+                pointGeometry.setAttribute('originalPosition', new THREE.BufferAttribute(originalPositions, 3));
+                pointGeometry.setAttribute('animationData', new THREE.BufferAttribute(animationData, 1));
+                const pointMaterial = new THREE.PointsMaterial({ color: 0x8b5cf6, size: 0.06, sizeAttenuation: true });
+                pointMesh = new THREE.Points(pointGeometry, pointMaterial);
                 scene.add(pointMesh);
 
-                // Lines
-                const lineMaterial = new THREE.LineBasicMaterial({ color: 0x8b5cf6, transparent: true, opacity: 0.3 });
-                for(let i = 0; i < numPoints; i++) {
-                    for(let j = i + 1; j < numPoints; j++) {
-                        const p1 = points[i];
-                        const p2 = points[j];
-                        const distance = p1.distanceTo(p2);
-                        if(distance < MAX_DISTANCE) {
-                            const geometry = new THREE.BufferGeometry().setFromPoints([p1, p2]);
-                            const line = new THREE.Line(geometry, lineMaterial);
-                            lines.push(line);
-                            scene.add(line);
-                        }
-                    }
-                }
-                
+                const lineGeometry = new THREE.BufferGeometry();
+                const linePositions = new Float32Array(NUM_POINTS * NUM_POINTS * 3);
+                lineGeometry.setAttribute('position', new THREE.BufferAttribute(linePositions, 3));
+                const lineMaterial = new THREE.LineBasicMaterial({ color: 0xa78bfa, transparent: true, opacity: 0.3 });
+                linesMesh = new THREE.LineSegments(lineGeometry, lineMaterial);
+                scene.add(linesMesh);
+
                 document.addEventListener('mousemove', onDocumentMouseMove, false);
                 window.addEventListener('resize', onWindowResize, false);
             }
 
             function onWindowResize() {
-                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.aspect = header.offsetWidth / header.offsetHeight;
                 camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setSize(header.offsetWidth, header.offsetHeight);
             }
-            
             function onDocumentMouseMove(event) {
-                mouseX = (event.clientX - window.innerWidth / 2) / 500;
-                mouseY = (event.clientY - window.innerHeight / 2) / 500;
+                mouseX = (event.clientX - window.innerWidth / 2) / 1000;
+                mouseY = (event.clientY - window.innerHeight / 2) / 1000;
             }
 
             function animate() {
                 requestAnimationFrame(animate);
-                const time = Date.now() * 0.0001;
-                
-                scene.rotation.y = time * 0.2;
-                
+                const time = Date.now() * 0.0003;
+                const positions = pointMesh.geometry.attributes.position.array;
+                const originalPositions = pointMesh.geometry.attributes.originalPosition.array;
+                const animationData = pointMesh.geometry.attributes.animationData.array;
+                for(let i=0; i<NUM_POINTS; i++) {
+                    const y_original = originalPositions[i * 3 + 1];
+                    const phase = animationData[i];
+                    positions[i * 3 + 1] = y_original + Math.sin(time + phase) * 0.5;
+                    points[i].y = positions[i * 3 + 1];
+                }
+                pointMesh.geometry.attributes.position.needsUpdate = true;
+                const hue = (0.7 + 0.05 * Math.sin(time * 0.5)) % 1;
+                pointMesh.material.color.setHSL(hue, 0.7, 0.6);
+                linesMesh.material.color.setHSL(hue, 0.7, 0.8);
+                const linePositions = linesMesh.geometry.attributes.position.array;
+                let lineIndex = 0;
+                for(let i = 0; i < NUM_POINTS; i++) {
+                    for(let j = i + 1; j < NUM_POINTS; j++) {
+                        const p1 = points[i], p2 = points[j];
+                        const distSq = p1.distanceToSquared(p2);
+                        if(distSq < MAX_DISTANCE_SQ) {
+                            linePositions[lineIndex++] = p1.x; linePositions[lineIndex++] = p1.y; linePositions[lineIndex++] = p1.z;
+                            linePositions[lineIndex++] = p2.x; linePositions[lineIndex++] = p2.y; linePositions[lineIndex++] = p2.z;
+                        }
+                    }
+                }
+                linesMesh.geometry.setDrawRange(0, lineIndex / 3);
+                linesMesh.geometry.attributes.position.needsUpdate = true;
+                scene.rotation.y = time * 0.1;
                 camera.position.x += (mouseX - camera.position.x) * 0.05;
                 camera.position.y += (-mouseY - camera.position.y) * 0.05;
                 camera.lookAt(scene.position);
-                
                 renderer.render(scene, camera);
             }
-            
             init3D();
             animate();
 
-            // --- Scroll Animations ---
-            const revealElements = document.querySelectorAll('.scroll-reveal');
-            const observer = new IntersectionObserver((entries) => {
+            // --- 솔루션 섹션 애니메이션 로직 ---
+            const solutionSection = document.getElementById('solution');
+            const path1 = document.getElementById('path1');
+            const path2 = document.getElementById('path2');
+            const particle1 = document.getElementById('particle1');
+            const particle2 = document.getElementById('particle2');
+            let animationFrameId = null;
+            let solutionAnimationIntervalId = null;
+
+            function updateSolutionPaths() {
+                if (!solutionSection || !path1 || !path2) return;
+                const source1 = document.getElementById('source-card-1');
+                const source2 = document.getElementById('source-card-2');
+                const target = document.getElementById('target-icon');
+                if (!source1 || !source2 || !target) return;
+
+                const sectionRect = solutionSection.getBoundingClientRect();
+                const source1Rect = source1.getBoundingClientRect();
+                const source2Rect = source2.getBoundingClientRect();
+                const targetRect = target.getBoundingClientRect();
+
+                const isMobile = window.innerWidth < 768;
+                const start1 = { 
+                    x: isMobile ? (source1Rect.left - sectionRect.left + source1Rect.width / 2) : (source1Rect.right - sectionRect.left),
+                    y: isMobile ? (source1Rect.bottom - sectionRect.top) : (source1Rect.top - sectionRect.top + source1Rect.height / 2)
+                };
+                const start2 = {
+                    x: isMobile ? (source2Rect.left - sectionRect.left + source2Rect.width / 2) : (source2Rect.right - sectionRect.left),
+                    y: isMobile ? (source2Rect.top - sectionRect.top) : (source2Rect.top - sectionRect.top + source2Rect.height / 2)
+                };
+                const end = { 
+                    x: targetRect.left - sectionRect.left + targetRect.width / 2, 
+                    y: targetRect.top - sectionRect.top + targetRect.height / 2
+                };
+                
+                const controlX1 = start1.x + (end.x - start1.x) * 0.5;
+                const controlX2 = start2.x + (end.x - start2.x) * 0.5;
+
+                const d1 = `M ${start1.x} ${start1.y} C ${controlX1} ${start1.y} ${end.x - 80} ${end.y} ${end.x} ${end.y}`;
+                const d2 = `M ${start2.x} ${start2.y} C ${controlX2} ${start2.y} ${end.x - 80} ${end.y} ${end.x} ${end.y}`;
+
+                path1.setAttribute('d', d1);
+                path2.setAttribute('d', d2);
+            }
+            
+            function runSolutionAnimation() {
+                if (solutionSection.classList.contains('is-animating')) return;
+                solutionSection.classList.add('is-animating');
+
+                const duration = 1500; // 1.5초
+                let startTime = null;
+
+                const animateParticles = (timestamp) => {
+                    if (!startTime) startTime = timestamp;
+                    const progress = Math.min((timestamp - startTime) / duration, 1);
+
+                    const length1 = path1.getTotalLength();
+                    const point1 = path1.getPointAtLength(length1 * progress);
+                    particle1.setAttribute('cx', point1.x);
+                    particle1.setAttribute('cy', point1.y);
+
+                    if(progress > 0.1) {
+                       const length2 = path2.getTotalLength();
+                       const point2 = path2.getPointAtLength(length2 * Math.max(0, (progress - 0.1) / 0.9));
+                       particle2.setAttribute('cx', point2.x);
+                       particle2.setAttribute('cy', point2.y);
+                    }
+                    
+                    if (progress < 1) {
+                        animationFrameId = requestAnimationFrame(animateParticles);
+                    } else {
+                         setTimeout(() => {
+                           solutionSection.classList.remove('is-animating');
+                        }, 2000);
+                    }
+                };
+                
+                animationFrameId = requestAnimationFrame(animateParticles);
+            }
+
+            // --- 스크롤 및 리사이즈 이벤트 리스너 ---
+            const generalObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('active');
                     }
                 });
             }, { threshold: 0.1 });
-            revealElements.forEach(el => observer.observe(el));
+            document.querySelectorAll('.scroll-reveal').forEach(el => generalObserver.observe(el));
+
+            const solutionObserver = new IntersectionObserver((entries) => {
+                 entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        if (solutionAnimationIntervalId === null) {
+                           runSolutionAnimation(); // 즉시 1회 실행
+                           solutionAnimationIntervalId = setInterval(runSolutionAnimation, 5000); // 5초마다 반복
+                        }
+                    } else {
+                        if (solutionAnimationIntervalId !== null) {
+                            clearInterval(solutionAnimationIntervalId);
+                            solutionAnimationIntervalId = null;
+                        }
+                    }
+                });
+            }, { threshold: 0.4 });
+            
+            if(solutionSection) {
+                solutionObserver.observe(solutionSection);
+            }
+            
+            window.addEventListener('resize', updateSolutionPaths);
+            updateSolutionPaths(); // 초기 로드 시 경로 계산
         });
     </script>
 </body>
