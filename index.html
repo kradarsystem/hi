@@ -21,8 +21,12 @@
     
     <style>
         /* 기본 바디 스타일 및 CSS 리셋 */
-        html {
+        html, body {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            /* Oopy.io 환경에서 불필요한 스크롤바가 생기는 것을 막기 위한 최종 수단 */
+            overflow-x: hidden !important;
         }
         *, *:before, *:after {
             box-sizing: inherit;
@@ -31,9 +35,6 @@
             font-family: 'Noto Sans KR', sans-serif;
             scroll-behavior: smooth;
             background-color: #f8fafc; /* 부드러운 흰색 배경 */
-            overflow-x: hidden; /* 가로 스크롤 방지 */
-            margin: 0;
-            padding: 0;
         }
 
         /* 3D 캔버스 스타일 */
@@ -327,36 +328,51 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- 노션 스크롤 최적화 스크립트 ---
-            const sendHeightToParent = () => {
-                // document.documentElement.scrollHeight가 가장 신뢰성 있는 전체 문서 높이 값
-                const bodyHeight = document.documentElement.scrollHeight;
-                // 부모 창(노션)으로 높이 값을 메시지로 전송
-                window.parent.postMessage({
-                    type: 'setHeight', // 메시지 타입 지정
-                    height: bodyHeight
-                }, '*'); // 모든 origin에 전송
+            /**
+             * Oopy.io 및 Notion Embed 환경을 위한 Iframe 높이 자동 조절 스크립트 (v4)
+             * 이 스크립트는 Github Pages에 올라간 HTML이 Oopy.io를 통해 Notion에 임베드될 때,
+             * PC에서 불필요한 세로 스크롤바가 생기는 문제를 해결하는 데 중점을 둡니다.
+             */
+            const oopyResizer = {
+                lastHeight: 0,
+                timer: null,
+                sendHeight: function() {
+                    // requestAnimationFrame을 사용하여 브라우저 렌더링 주기에 맞춰 실행
+                    requestAnimationFrame(() => {
+                        const currentHeight = document.documentElement.scrollHeight;
+                        if (currentHeight !== this.lastHeight) {
+                            this.lastHeight = currentHeight;
+                            // Oopy.io가 인식하는 이벤트 메시지 형식으로 전송
+                            window.parent.postMessage({
+                                oopyEvent: 'setHeight',
+                                height: currentHeight
+                            }, '*');
+                        }
+                    });
+                },
+                scheduleSendHeight: function() {
+                    if (this.timer) {
+                        clearTimeout(this.timer);
+                    }
+                    // 디바운싱: 잦은 호출을 방지하고 마지막 호출만 실행
+                    this.timer = setTimeout(() => this.sendHeight(), 150);
+                },
+                init: function() {
+                    window.addEventListener('load', () => this.scheduleSendHeight());
+                    window.addEventListener('resize', () => this.scheduleSendHeight());
+
+                    const observer = new MutationObserver(() => this.scheduleSendHeight());
+                    observer.observe(document.body, {
+                        childList: true,
+                        subtree: true,
+                        attributes: true,
+                        characterData: true
+                    });
+                    this.scheduleSendHeight();
+                }
             };
+            oopyResizer.init();
 
-            // 페이지의 모든 리소스(이미지, 폰트 등)가 로드된 후 높이를 전송
-            window.addEventListener('load', () => {
-                sendHeightToParent();
-                // 렌더링이 불안정할 경우를 대비해 약간의 시간차를 두고 여러 번 전송
-                setTimeout(sendHeightToParent, 100);
-                setTimeout(sendHeightToParent, 500);
-            });
-
-            // 창 크기가 변경될 때마다 높이를 다시 전송
-            window.addEventListener('resize', sendHeightToParent);
-
-            // DOM의 내용이나 구조가 변경될 때마다 높이를 다시 계산하여 전송 (가장 확실한 방법)
-            const observer = new MutationObserver(sendHeightToParent);
-            observer.observe(document.body, {
-                childList: true, // 자식 요소 추가/제거 감지
-                subtree: true,   // 모든 하위 요소 감지
-                attributes: true // 속성 변경 감지
-            });
-            
 
             // --- 3D Hero Animation ---
             let scene, camera, renderer, points, pointMesh, linesMesh;
