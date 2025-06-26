@@ -23,6 +23,11 @@
         /* 기본 바디 스타일 및 CSS 리셋 */
         html {
             box-sizing: border-box;
+            overflow-y: scroll; /* 스크롤바 공간을 항상 확보하여 레이아웃 깨짐 방지 */
+        }
+        html, body {
+            margin: 0;
+            padding: 0;
         }
         *, *:before, *:after {
             box-sizing: inherit;
@@ -31,8 +36,6 @@
             font-family: 'Noto Sans KR', sans-serif;
             scroll-behavior: smooth;
             background-color: #f8fafc; /* 부드러운 흰색 배경 */
-            margin: 0;
-            padding: 0;
             overflow-x: hidden; /* 가로 스크롤만 방지 */
         }
 
@@ -327,65 +330,77 @@
 
     <script>
         /**
-         * Oopy.io & Notion Embed Resizer v6
-         * This script is specifically designed to solve the vertical scrollbar issue 
-         * in a complex Github Pages -> Oopy.io -> Notion environment.
+         * Oopy.io & Notion Embed Resizer v7 (Final Attempt)
+         * This script is the most robust version, designed to definitively solve the 
+         * vertical scrollbar issue in the complex Github Pages -> Oopy.io -> Notion environment.
          */
         (function() {
-            // Only run if inside an iframe
+            // Only run if the page is embedded in an iframe
             if (window.self === window.top) {
                 return;
             }
 
             const resizer = {
                 lastHeight: 0,
+                // Use a timer to debounce resize events, preventing performance issues
                 timer: null,
 
-                // Use requestAnimationFrame for smoother, more efficient resizing
+                // The core function to calculate and send the height
                 sendHeight: function() {
+                    // Use requestAnimationFrame to ensure the height is calculated after the browser has painted
                     requestAnimationFrame(() => {
+                        // Use scrollHeight for the most reliable full-document height
                         const currentHeight = document.documentElement.scrollHeight;
+
+                        // Only send the message if the height has actually changed
                         if (currentHeight !== this.lastHeight) {
                             this.lastHeight = currentHeight;
-                            // This is the message format Oopy.io expects
+                            // This is the specific message format Oopy.io's script listens for
                             window.parent.postMessage({
                                 oopyEvent: 'setHeight',
                                 height: currentHeight
-                            }, '*');
+                            }, '*'); // Send to any parent origin
                         }
                     });
                 },
 
-                // Debounce the resize event to avoid performance issues
+                // A scheduler to run sendHeight after a short delay, grouping multiple rapid changes
                 scheduleSendHeight: function() {
                     clearTimeout(this.timer);
+                    // A 150ms delay is a good balance between responsiveness and performance
                     this.timer = setTimeout(() => this.sendHeight(), 150);
                 },
 
                 init: function() {
-                    // Initial resizing after all resources are loaded
-                    window.addEventListener('load', () => {
-                        this.scheduleSendHeight();
-                        // Send height multiple times to ensure it's captured
-                        setTimeout(() => this.scheduleSendHeight(), 500);
-                        setTimeout(() => this.scheduleSendHeight(), 1000);
-                    });
-
-                    // Resize on window dimension changes
-                    window.addEventListener('resize', () => this.scheduleSendHeight());
-
-                    // Use MutationObserver to detect any DOM changes
+                    // Use MutationObserver to detect ANY change in the DOM that might affect height
                     const observer = new MutationObserver(() => this.scheduleSendHeight());
                     observer.observe(document.body, {
-                        attributes: true,
-                        childList: true,
-                        subtree: true,
-                        characterData: true
+                        attributes: true,    // e.g., style changes
+                        childList: true,     // e.g., new elements added
+                        subtree: true,       // throughout the entire DOM tree
+                        characterData: true  // e.g., text changes
                     });
+
+                    // Also listen for standard window events
+                    window.addEventListener('resize', () => this.scheduleSendHeight());
+                    
+                    // On initial load, it's crucial to check the height multiple times
+                    // as assets (fonts, images) may load and change the layout.
+                    window.addEventListener('load', () => {
+                        this.scheduleSendHeight();
+                        // Aggressively check a few more times after the initial load
+                        setTimeout(() => this.scheduleSendHeight(), 300);
+                        setTimeout(() => this.scheduleSendHeight(), 600);
+                        setTimeout(() => this.scheduleSendHeight(), 1000);
+                    });
+                    
+                    // Initial call for good measure
+                    this.scheduleSendHeight();
                 }
             };
             
             resizer.init();
+
         })();
 
 
