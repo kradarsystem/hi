@@ -21,12 +21,8 @@
     
     <style>
         /* 기본 바디 스타일 및 CSS 리셋 */
-        html, body {
+        html {
             box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            /* Oopy.io 환경에서 불필요한 스크롤바가 생기는 것을 막기 위한 최종 수단 */
-            overflow-x: hidden !important;
         }
         *, *:before, *:after {
             box-sizing: inherit;
@@ -35,6 +31,9 @@
             font-family: 'Noto Sans KR', sans-serif;
             scroll-behavior: smooth;
             background-color: #f8fafc; /* 부드러운 흰색 배경 */
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden; /* 가로 스크롤만 방지 */
         }
 
         /* 3D 캔버스 스타일 */
@@ -327,22 +326,28 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            /**
-             * Oopy.io 및 Notion Embed 환경을 위한 Iframe 높이 자동 조절 스크립트 (v4)
-             * 이 스크립트는 Github Pages에 올라간 HTML이 Oopy.io를 통해 Notion에 임베드될 때,
-             * PC에서 불필요한 세로 스크롤바가 생기는 문제를 해결하는 데 중점을 둡니다.
-             */
-            const oopyResizer = {
+        /**
+         * Oopy.io & Notion Embed Resizer v6
+         * This script is specifically designed to solve the vertical scrollbar issue 
+         * in a complex Github Pages -> Oopy.io -> Notion environment.
+         */
+        (function() {
+            // Only run if inside an iframe
+            if (window.self === window.top) {
+                return;
+            }
+
+            const resizer = {
                 lastHeight: 0,
                 timer: null,
+
+                // Use requestAnimationFrame for smoother, more efficient resizing
                 sendHeight: function() {
-                    // requestAnimationFrame을 사용하여 브라우저 렌더링 주기에 맞춰 실행
                     requestAnimationFrame(() => {
                         const currentHeight = document.documentElement.scrollHeight;
                         if (currentHeight !== this.lastHeight) {
                             this.lastHeight = currentHeight;
-                            // Oopy.io가 인식하는 이벤트 메시지 형식으로 전송
+                            // This is the message format Oopy.io expects
                             window.parent.postMessage({
                                 oopyEvent: 'setHeight',
                                 height: currentHeight
@@ -350,30 +355,42 @@
                         }
                     });
                 },
+
+                // Debounce the resize event to avoid performance issues
                 scheduleSendHeight: function() {
-                    if (this.timer) {
-                        clearTimeout(this.timer);
-                    }
-                    // 디바운싱: 잦은 호출을 방지하고 마지막 호출만 실행
+                    clearTimeout(this.timer);
                     this.timer = setTimeout(() => this.sendHeight(), 150);
                 },
+
                 init: function() {
-                    window.addEventListener('load', () => this.scheduleSendHeight());
+                    // Initial resizing after all resources are loaded
+                    window.addEventListener('load', () => {
+                        this.scheduleSendHeight();
+                        // Send height multiple times to ensure it's captured
+                        setTimeout(() => this.scheduleSendHeight(), 500);
+                        setTimeout(() => this.scheduleSendHeight(), 1000);
+                    });
+
+                    // Resize on window dimension changes
                     window.addEventListener('resize', () => this.scheduleSendHeight());
 
+                    // Use MutationObserver to detect any DOM changes
                     const observer = new MutationObserver(() => this.scheduleSendHeight());
                     observer.observe(document.body, {
+                        attributes: true,
                         childList: true,
                         subtree: true,
-                        attributes: true,
                         characterData: true
                     });
-                    this.scheduleSendHeight();
                 }
             };
-            oopyResizer.init();
+            
+            resizer.init();
+        })();
 
 
+        // The rest of the page's animation scripts
+        document.addEventListener('DOMContentLoaded', () => {
             // --- 3D Hero Animation ---
             let scene, camera, renderer, points, pointMesh, linesMesh;
             let mouseX = 0, mouseY = 0;
