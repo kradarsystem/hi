@@ -75,7 +75,7 @@
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
             border: 2px solid transparent;
-            border-radius: 0.75rem;
+            border-radius: 0.75rem; /* 12px */
             background: linear-gradient(var(--angle), var(--color-1), var(--color-2)) border-box;
             -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
             mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
@@ -327,10 +327,42 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // --- 노션 스크롤 최적화 스크립트 ---
+            const sendHeightToParent = () => {
+                // document.documentElement.scrollHeight가 가장 신뢰성 있는 전체 문서 높이 값
+                const bodyHeight = document.documentElement.scrollHeight;
+                // 부모 창(노션)으로 높이 값을 메시지로 전송
+                window.parent.postMessage({
+                    type: 'setHeight', // 메시지 타입 지정
+                    height: bodyHeight
+                }, '*'); // 모든 origin에 전송
+            };
+
+            // 페이지의 모든 리소스(이미지, 폰트 등)가 로드된 후 높이를 전송
+            window.addEventListener('load', () => {
+                sendHeightToParent();
+                // 렌더링이 불안정할 경우를 대비해 약간의 시간차를 두고 여러 번 전송
+                setTimeout(sendHeightToParent, 100);
+                setTimeout(sendHeightToParent, 500);
+            });
+
+            // 창 크기가 변경될 때마다 높이를 다시 전송
+            window.addEventListener('resize', sendHeightToParent);
+
+            // DOM의 내용이나 구조가 변경될 때마다 높이를 다시 계산하여 전송 (가장 확실한 방법)
+            const observer = new MutationObserver(sendHeightToParent);
+            observer.observe(document.body, {
+                childList: true, // 자식 요소 추가/제거 감지
+                subtree: true,   // 모든 하위 요소 감지
+                attributes: true // 속성 변경 감지
+            });
+            
+
             // --- 3D Hero Animation ---
             let scene, camera, renderer, points, pointMesh, linesMesh;
             let mouseX = 0, mouseY = 0;
             const canvas = document.getElementById('hero-canvas');
+            if (!canvas) return;
             const header = canvas.parentElement;
             const MAX_DISTANCE_SQ = 1.8 * 1.8;
             const NUM_POINTS = 200;
@@ -374,6 +406,7 @@
             }
 
             function onWindowResize() {
+                if (!camera || !renderer || !header) return;
                 camera.aspect = header.offsetWidth / header.offsetHeight;
                 camera.updateProjectionMatrix();
                 renderer.setSize(header.offsetWidth, header.offsetHeight);
