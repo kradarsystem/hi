@@ -28,7 +28,7 @@
             font-family: 'Noto Sans KR', sans-serif;
             background-color: #f4f4f5; /* 밝은 회색 배경 */
             color: #18181b;
-            overflow: hidden; /* 노션 임베드를 위한 스크롤바 제거 */
+            overflow: hidden; /* 전체 페이지 스크롤 방지 */
             height: 100vh;
         }
         
@@ -61,7 +61,7 @@
             border-radius: 1.5rem; /* 24px */
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
             max-height: 95vh;
-            overflow-y: auto;
+            overflow-y: auto; 
         }
         /* 커스텀 스크롤바 */
         .main-card::-webkit-scrollbar { width: 5px; }
@@ -124,10 +124,9 @@
     <canvas id="bg-canvas"></canvas>
 
     <div class="page-container">
-        <!-- ▼▼▼ 수정된 부분: 전체적으로 확장된 레이아웃 ▼▼▼ -->
-        <div class="main-card w-full max-w-7xl mx-auto p-6 md:p-8 grid grid-cols-1 lg:grid-cols-5 gap-8">
+        <div class="main-card w-full max-w-7xl mx-auto p-6 md:p-8 grid grid-cols-1 lg:grid-cols-8 gap-8">
             
-            <div class="lg:col-span-2">
+            <div class="lg:col-span-3">
                 <div class="animate-in delay-100 mb-6">
                     <h1 class="text-4xl md:text-5xl font-black tracking-tight text-gray-900">
                         <span class="gradient-text">융복합 솔루션</span>으로<br>미래를 선도합니다
@@ -143,7 +142,6 @@
                     </div>
                 </div>
                 
-                <!-- ▼▼▼ 수정된 부분: 애니메이션 클래스 제거 ▼▼▼ -->
                 <div class="animate-in delay-200 p-4 bg-gray-100/80 rounded-xl border border-gray-200 shadow-lg">
                    <h3 class="text-xl font-bold text-center mb-4 text-gray-800">핵심 역량</h3>
                     <div class="flex items-center space-x-4">
@@ -167,42 +165,43 @@
                 </div>
             </div>
 
-            <div class="lg:col-span-3">
+            <div class="lg:col-span-5">
                 <div class="h-full flex flex-col">
                     <h2 class="text-2xl font-bold text-center text-gray-900 mb-5 animate-in delay-300">주요 사업 분야</h2>
+                    <!-- ▼▼▼ 수정된 부분: flex-grow 추가하여 그리드가 세로 공간을 채우도록 함 ▼▼▼ -->
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-5 flex-grow">
                         
-                        <div class="business-card animate-in delay-400 rounded-xl p-4 text-center flex flex-col justify-center">
+                        <div class="business-card animate-in delay-400 rounded-xl p-5 text-center flex flex-col justify-center h-full">
                             <i class="ph-fill ph-traffic-signal text-5xl text-yellow-500 mx-auto"></i>
                             <h3 class="font-bold mt-2">스마트 교통</h3>
                             <p class="text-sm text-gray-500 mt-1">최적의 교통 신호 산출</p>
                         </div>
                         
-                        <div class="business-card animate-in delay-500 rounded-xl p-4 text-center flex flex-col justify-center">
+                        <div class="business-card animate-in delay-500 rounded-xl p-5 text-center flex flex-col justify-center h-full">
                             <i class="ph-fill ph-person-simple-walk text-5xl text-pink-500 mx-auto"></i>
                             <h3 class="font-bold mt-2">스마트 횡단보도</h3>
                             <p class="text-sm text-gray-500 mt-1">안전한 보행 환경 조성</p>
                         </div>
                         
-                        <div class="business-card animate-in delay-600 rounded-xl p-4 text-center flex flex-col justify-center">
+                        <div class="business-card animate-in delay-600 rounded-xl p-5 text-center flex flex-col justify-center h-full">
                             <i class="ph-fill ph-shield-warning text-5xl text-blue-500 mx-auto"></i>
                             <h3 class="font-bold mt-2">스마트 방재</h3>
                             <p class="text-sm text-gray-500 mt-1">상시 재난 감시 시스템</p>
                         </div>
                         
-                        <div class="business-card animate-in delay-500 rounded-xl p-4 text-center flex flex-col justify-center">
+                        <div class="business-card animate-in delay-500 rounded-xl p-5 text-center flex flex-col justify-center h-full">
                             <i class="ph-fill ph-intersect text-5xl text-green-500 mx-auto"></i>
                             <h3 class="font-bold mt-2">스마트 교차로</h3>
                             <p class="text-sm text-gray-500 mt-1">최적의 신호 주기 제어</p>
                         </div>
 
-                        <div class="business-card animate-in delay-600 rounded-xl p-4 text-center flex flex-col justify-center">
+                        <div class="business-card animate-in delay-600 rounded-xl p-5 text-center flex flex-col justify-center h-full">
                             <i class="ph-fill ph-scan text-5xl text-red-500 mx-auto"></i>
                             <h3 class="font-bold mt-2">차량번호 인식</h3>
                             <p class="text-sm text-gray-500 mt-1">AI 기반 다중 차량 탐지</p>
                         </div>
                         
-                        <div class="business-card animate-in delay-700 rounded-xl p-4 text-center flex flex-col justify-center">
+                        <div class="business-card animate-in delay-700 rounded-xl p-5 text-center flex flex-col justify-center h-full">
                             <i class="ph-fill ph-waves text-5xl text-sky-500 mx-auto"></i>
                             <h3 class="font-bold mt-2">스마트 소하천 관리</h3>
                             <p class="text-sm text-gray-500 mt-1">스마트 유량 관리</p>
@@ -217,50 +216,53 @@
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         // 3D 배경 애니메이션 스크립트
-        let scene, camera, renderer, particles;
+        let scene, camera, renderer, stars, starVelocities;
         let mouseX = 0, mouseY = 0;
         const canvas = document.getElementById('bg-canvas');
         if (!canvas) return;
 
         function init3D() {
             scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = 5;
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
+            camera.position.z = 1;
+
             renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-            const particleCount = 5000;
-            const positions = new Float32Array(particleCount * 3);
-            const colors = new Float32Array(particleCount * 3);
-            const color1 = new THREE.Color("#5b21b6");
-            const color2 = new THREE.Color("#4338ca");
+            const starVertices = [];
+            starVelocities = []; // 초기화
+            const starColors = [];
 
-            for (let i = 0; i < particleCount; i++) {
-                positions[i * 3] = (Math.random() - 0.5) * 10;
-                positions[i * 3 + 1] = (Math.random() - 0.5) * 10;
-                positions[i * 3 + 2] = (Math.random() - 0.5) * 10;
+            const color1 = new THREE.Color('#7c3aed'); // violet-600
+            const color2 = new THREE.Color('#4f46e5'); // indigo-600
+            
+            for (let i = 0; i < 6000; i++) {
+                const x = THREE.MathUtils.randFloatSpread(100);
+                const y = THREE.MathUtils.randFloatSpread(100);
+                const z = THREE.MathUtils.randFloatSpread(100);
+                starVertices.push(x, y, z);
+                
+                starVelocities.push(0, 0, THREE.MathUtils.randFloat(0.05, 0.1));
+                
                 const mixedColor = color1.clone().lerp(color2, Math.random());
-                colors[i*3] = mixedColor.r;
-                colors[i*3+1] = mixedColor.g;
-                colors[i*3+2] = mixedColor.b;
+                starColors.push(mixedColor.r, mixedColor.g, mixedColor.b);
             }
+
+            const starGeometry = new THREE.BufferGeometry();
+            starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
+            starGeometry.setAttribute('color', new THREE.Float32BufferAttribute(starColors, 3));
             
-            const particlesGeometry = new THREE.BufferGeometry();
-            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-            
-            const particlesMaterial = new THREE.PointsMaterial({
-                size: 0.02,
-                sizeAttenuation: true,
+            const starMaterial = new THREE.PointsMaterial({
+                size: 0.15,
                 vertexColors: true,
                 transparent: true,
                 opacity: 0.8
             });
-            
-            particles = new THREE.Points(particlesGeometry, particlesMaterial);
-            scene.add(particles);
 
+            stars = new THREE.Points(starGeometry, starMaterial);
+            scene.add(stars);
+            
             document.addEventListener('mousemove', onDocumentMouseMove, false);
             window.addEventListener('resize', onWindowResize, false);
         }
@@ -269,22 +271,30 @@
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         }
 
         function onDocumentMouseMove(event) {
-            mouseX = (event.clientX - window.innerWidth / 2) / 2000;
-            mouseY = (event.clientY - window.innerHeight / 2) / 2000;
+            mouseX = event.clientX - window.innerWidth / 2;
+            mouseY = event.clientY - window.innerHeight / 2;
         }
 
         function animate() {
             requestAnimationFrame(animate);
-            const elapsedTime = Date.now() * 0.0001;
-            particles.rotation.y = elapsedTime * 0.5;
-            particles.rotation.x = elapsedTime * 0.2;
-            camera.position.x += (mouseX - camera.position.x) * 0.05;
-            camera.position.y += (-mouseY - camera.position.y) * 0.05;
-            camera.lookAt(scene.position);
+            
+            const positions = stars.geometry.attributes.position.array;
+            
+            for(let i = 0; i < positions.length; i += 3) {
+                positions[i + 2] += starVelocities[i + 2];
+                if (positions[i + 2] > 50) {
+                    positions[i + 2] = -50;
+                }
+            }
+            stars.geometry.attributes.position.needsUpdate = true;
+            
+            stars.rotation.y = mouseX * 0.0001;
+            stars.rotation.x = mouseY * 0.0001;
+
             renderer.render(scene, camera);
         }
         
